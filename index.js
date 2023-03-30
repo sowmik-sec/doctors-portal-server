@@ -15,11 +15,22 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
-client.connect((err) => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  client.close();
-});
+
+const run = async () => {
+  try {
+    const appointmentOptionCollection = client
+      .db("doctorsPortal")
+      .collection("appointmentOptions");
+
+    app.get("/appointmentOptions", async (req, res) => {
+      const query = {};
+      const options = await appointmentOptionCollection.find(query).toArray();
+      res.send(options);
+    });
+  } finally {
+  }
+};
+run().catch(console.log);
 
 app.get("/", async (req, res) => {
   res.send(`doctor's portal server is running`);
