@@ -26,10 +26,12 @@ const run = async () => {
       .db("doctorsPortal")
       .collection("bookings");
 
+    //Use Aggregate to query multiple collection and then merge data
     app.get("/appointmentOptions", async (req, res) => {
       const query = {};
       const date = req.query.date;
       const options = await appointmentOptionCollection.find(query).toArray();
+      // get the bookings of the provided date
       const bookingQuery = { appointmentDate: date };
       const alreadyBooked = await bookingsCollection
         .find(bookingQuery)
@@ -37,9 +39,13 @@ const run = async () => {
 
       options.forEach((option) => {
         const optionBooked = alreadyBooked.filter(
-          (book) => book.treatment === option.treatment
+          (book) => book.treatment === option.name
         );
         const bookedSlots = optionBooked.map((book) => book.slot);
+        const remainingSlots = option.slots.filter(
+          (slot) => !bookedSlots.includes(slot)
+        );
+        option.slots = remainingSlots;
       });
       res.send(options);
     });
