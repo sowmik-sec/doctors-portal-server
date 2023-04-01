@@ -125,7 +125,6 @@ const run = async () => {
     });
     app.post("/bookings", async (req, res) => {
       const booking = req.body;
-      console.log(booking);
       const query = {
         appointmentDate: booking.appointmentDate,
         email: booking.email,
@@ -171,7 +170,7 @@ const run = async () => {
       const decodedEmail = req.decoded.email;
       const query = { email: decodedEmail };
       const user = await usersCollection.findOne(query);
-      if (user.rold !== "admin") {
+      if (user.role !== "admin") {
         return res.status(403).send({ message: "forbidden access" });
       }
       const id = req.params.id;
