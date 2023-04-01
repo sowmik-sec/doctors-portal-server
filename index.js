@@ -150,7 +150,13 @@ const run = async () => {
       }
       res.status(403).send({ accessToken: "" });
     });
-    app.get("/users", async (req, res) => {
+    app.get("/users", verifyJWT, async (req, res) => {
+      const decodedEmail = req.decoded.email;
+      const queryAdmin = { email: decodedEmail };
+      const user = await usersCollection.findOne(queryAdmin);
+      if (user.role !== "admin") {
+        return res.status(403).send({ message: "forbidden access" });
+      }
       const query = {};
       const users = await usersCollection.find(query).toArray();
       res.send(users);
