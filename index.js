@@ -116,7 +116,7 @@ const run = async () => {
     app.get("/bookings", verifyJWT, async (req, res) => {
       const email = req.query.email;
       const decodedEmail = req.decoded.email;
-      if (email != decodedEmail) {
+      if (email !== decodedEmail) {
         return res.status(403).send({ message: "forbidden access" });
       }
       const query = { email: email };
@@ -155,6 +155,12 @@ const run = async () => {
       const query = {};
       const users = await usersCollection.find(query).toArray();
       res.send(users);
+    });
+    app.get("/users/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const user = await usersCollection.findOne(query);
+      res.send({ isAdmin: user?.role === "admin" });
     });
     app.post("/users", async (req, res) => {
       const user = req.body;
