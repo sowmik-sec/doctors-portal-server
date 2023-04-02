@@ -145,6 +145,12 @@ const run = async () => {
       const bookings = await bookingsCollection.find(query).toArray();
       res.send(bookings);
     });
+    app.get("/bookings/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const booking = await bookingsCollection.findOne(query);
+      res.send(booking);
+    });
     app.post("/bookings", async (req, res) => {
       const booking = req.body;
       const query = {
