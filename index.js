@@ -46,6 +46,9 @@ const run = async () => {
 
     const usersCollection = client.db("doctorsPortal").collection("users");
     const doctorsCollection = client.db("doctorsPortal").collection("doctors");
+    const paymentsCollection = client
+      .db("doctorsPortal")
+      .collection("payments");
 
     // NOTE: make sure you use verifyAdmin after verifyJWT
     const verifyAdmin = async (req, res, next) => {
@@ -180,6 +183,23 @@ const run = async () => {
       res.send({
         clientSecret: paymentIntent.client_secret,
       });
+    });
+    app.post("/payments", async (req, res) => {
+      const payment = req.body;
+      const result = await paymentsCollection.insertOne(payment);
+      const id = payment.bookingId;
+      const filter = { _id: new ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          paid: true,
+          transactionId: payment.transactionId,
+        },
+      };
+      const updatedResult = await bookingsCollection.updateOne(
+        filter,
+        updatedDoc
+      );
+      res.send(result);
     });
     app.get("/jwt", async (req, res) => {
       const email = req.query.email;
